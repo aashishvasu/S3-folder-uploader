@@ -1,6 +1,4 @@
 import os
-from time import sleep, strftime
-from unittest import result
 import boto3
 import datetime
 import json
@@ -8,7 +6,6 @@ import src.settings as settings
 from src.file_progress import ProgressPercentage
 
 # MT
-from concurrent.futures import ThreadPoolExecutor
 import threading
 MAXTHREADS:int = 8
 threads:dict = {}
