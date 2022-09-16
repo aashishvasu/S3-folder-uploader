@@ -6,7 +6,7 @@ A simple and sweet folder uploader for S3-compliant object storage made in pytho
 S3FU is built using python and a few libraries to be a multithreaded option to upload entire folders to S3-compliant storage.
 
 ### Usage
-- Get the [latest release](/releases/latest) or clone the repo
+- Get the [latest release](https://github.com/aashishvasu/S3-folder-uploader/releases/latest) or clone the repo
 - Install the [prerequisites](#Prerequisites) (see below)
 - Fill out the `settings.ini` file based on your S3 settings
 - Run using
