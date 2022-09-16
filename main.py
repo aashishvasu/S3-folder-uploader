@@ -100,7 +100,7 @@ while True:
 			input.update(current_count=0, max=len(uploader._filepaths))
 
 	# Open the settings file
-	if event == 'Settings':
+	if event == 'S3 Settings':
 		os.startfile('settings.ini')
 
 	if event == 'Upload':
