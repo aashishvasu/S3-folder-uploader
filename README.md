@@ -45,6 +45,13 @@ pip install boto3
 pip install pysimplegui
 ```
 
+### Development
+- All of the UI code except the error window is in `main.py`
+- [`uploader.py`](src/uploader.py) handles uploading the files in separate threads (the multithreading logic is very sus, sorry)
+- [`settings.py`](src/settings.py) handles saving and loading the `settings.ini` file
+- [`errorWindow.py`](src/errorWindow.py) handles creating an external error window.
+- [`file_progress.py`](src/errorWindow.py) reports the progress of the currently uploading file to the ui via callback
+
 ## Built With
 - Python
 - PySimpleGUI
