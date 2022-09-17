@@ -7,7 +7,6 @@ import src.errorWindow as error
 folder:str = ''
 path:str = ''
 totalfiles:int = 0
-threads:dict = {}
 
 # Theme
 sg.theme('BrownBlue')
@@ -36,19 +35,9 @@ window = sg.Window('Object Storage Uploader', mainLayout)
 
 def progress_update(number:int):
 	window.write_event_value('progress-bar', number)
-	window['-TOTALFILES-'].update(value='Files: {}'.format(totalfiles-number))
-
-	if number == totalfiles:
-		window['-DONETEXT-'].update(visible=True)
-		window['-FILENAME-'].update(visible=False)
-		window['-SERVER-'].update(disabled=False)
-		window['-LOCAL-'].update(disabled=False)
-		window['Start'].update(disabled=False)
-		window['S3 Settings'].update(disabled=False)
 
 def file_progress_update(current:int, filename:str):
-	window['-FILENAME-'].update(value=filename, visible=True)
-	window.write_event_value('file-progress-bar', current)
+	window.write_event_value('file-progress-bar', (current, filename))
 
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
@@ -72,10 +61,20 @@ while True:
 	# Progress bar updated
 	if event == "progress-bar":
 		window['-TOTALPROGRESSBAR-'].update(values[event])
+		window['-TOTALFILES-'].update(value='Files: {}'.format(totalfiles-values[event]))
+
+		if values[event] == totalfiles:
+			window['-DONETEXT-'].update(visible=True)
+			window['-FILENAME-'].update(visible=False)
+			window['-SERVER-'].update(disabled=False)
+			window['-LOCAL-'].update(disabled=False)
+			window['Start'].update(disabled=False)
+			window['S3 Settings'].update(disabled=False)
 	
 	# File progress bar updated
 	if event == "file-progress-bar":
-		window['-FILEPROGRESSBAR-'].update(values[event])
+		window['-FILEPROGRESSBAR-'].update(values[event][0])
+		window['-FILENAME-'].update(value=values[event][1], visible=True)
 
 	# Open and initialize the upload panel
 	if event == 'Start':
