@@ -11,6 +11,30 @@ totalfiles:int = 0
 # Theme
 sg.theme('BrownBlue')
 
+def CreateFileProgressBars(numThreads:int):
+	halfThreads:int = int(numThreads/2)
+	# Create a bunch of UI elements programmatically
+	# We're using half threads so that indices can be split into two lists that can be iterated
+	names1 = []
+	names2 = []
+	for x in range(halfThreads):
+		names1.append(str(x))
+		names2.append(str(x+halfThreads))
+
+	print(names1)
+	print(names2)
+	layout =	[]
+
+	for x in range(halfThreads):
+		layout +=	[
+						[
+							sg.Frame('', [[sg.ProgressBar(size=(25,5), max_value=100, orientation='h', key='progress{}'.format(x))]], font=('Arial', 7), key='name{}'.format(x), pad=(10,5)),
+							sg.Frame('', [[sg.ProgressBar(size=(25,5), max_value=100, orientation='h', key='progress{}'.format(x+halfThreads))]], font=('Arial', 7), key='name{}'.format(x+halfThreads), pad=(10,5))
+						]
+					]
+
+	return layout
+
 # Layouts
 LocalPathError = [	[sg.Text(size=(10, 1)), sg.Text('Invalid Local Path', text_color='red')]	]
 
@@ -21,13 +45,13 @@ col1Layout =	[
 					[sg.Button('Start'), sg.Button('S3 Settings'), sg.Push(), sg.Button('Quit')]
 				]
 col2Layout =	[
-					[sg.ProgressBar(size=(30,10), max_value=1, orientation='h', key='-FILEPROGRESSBAR-')],
-					[sg.ProgressBar(size=(30,10), max_value=1, orientation='h', key='-TOTALPROGRESSBAR-')],
+					[sg.Column(CreateFileProgressBars(uploader.MAXTHREADS))],
+					[sg.ProgressBar(size=(60,10), max_value=1, orientation='h', key='-TOTALPROGRESSBAR-')],
 					[sg.Text('Total Files: ', key='-TOTALFILES-'), sg.Push(), sg.Text('', key='-FILENAME-')],
 					[sg.Button('Upload'), sg.Push(), sg.Text('Upload Done!', text_color='aquamarine2', key='-DONETEXT-', visible=False)]
 				]
 mainLayout =	[
-					[sg.Column(col1Layout), sg.Column(col2Layout, key='-UPLOADPANEL-', visible=False)]
+					[sg.Frame('Browser', col1Layout), sg.Column(col2Layout, key='-UPLOADPANEL-', visible=False)]
 				]
 
 # Create the Window
@@ -36,8 +60,8 @@ window = sg.Window('Object Storage Uploader', mainLayout)
 def progress_update(number:int):
 	window.write_event_value('progress-bar', number)
 
-def file_progress_update(current:int, filename:str):
-	window.write_event_value('file-progress-bar', (current, filename))
+def file_progress_update(current:int, filename:str, progressIndex:int):
+	window.write_event_value('file-progress-bar', (current, filename, progressIndex))
 
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
@@ -73,8 +97,8 @@ while True:
 	
 	# File progress bar updated
 	if event == "file-progress-bar":
-		window['-FILEPROGRESSBAR-'].update(values[event][0])
-		window['-FILENAME-'].update(value=values[event][1], visible=True)
+		window['progress{}'.format(values[event][2])].update(values[event][0])
+		window['name{}'.format(values[event][2])].update(value=values[event][1], visible=True)
 
 	# Open and initialize the upload panel
 	if event == 'Start':
@@ -93,8 +117,6 @@ while True:
 			input = window['-TOTALFILES-']
 			input.update(value='Files: {}'.format(len(uploader._filepaths)))
 			totalfiles = len(uploader._filepaths)
-			input = window['-FILEPROGRESSBAR-']
-			input.update(current_count=0, max=100)
 			input = window['-TOTALPROGRESSBAR-']
 			input.update(current_count=0, max=len(uploader._filepaths))
 

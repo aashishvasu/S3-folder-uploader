@@ -7,7 +7,8 @@ from src.file_progress import ProgressPercentage
 
 # MT
 import threading
-MAXTHREADS:int = 8
+import multiprocessing
+MAXTHREADS:int = multiprocessing.cpu_count()
 threads:dict = {}
 
 # Vars
@@ -52,7 +53,7 @@ def upload_files(filecallback, totalcallback):
 			# This second check is if there are less filepaths than MAXTHREADS
 			if len(_filepaths) != 0:
 				filepath = _filepaths.pop()
-				t = threading.Thread(target=thread_upload, args=(filepath, _localdirpath, _serverdirpath, filecallback, totalcallback))
+				t = threading.Thread(target=thread_upload, args=(filepath, _localdirpath, _serverdirpath, x, filecallback, totalcallback))
 				threads[filepath] = t
 				t.start()
 		
@@ -60,7 +61,7 @@ def upload_files(filecallback, totalcallback):
 		# Dump generated output to json if there are no more threads to process and all files have been processed
 		json_dump()
 
-def thread_upload(filepath:str, localpath:str, serverpath:str, filecallback,  totalcallback):
+def thread_upload(filepath:str, localpath:str, serverpath:str, threadIndex:int, filecallback,  totalcallback):
 	internal_filepath = filepath
 	server_key = filepath.replace(localpath, serverpath).replace("\\", "/")
 
@@ -69,7 +70,7 @@ def thread_upload(filepath:str, localpath:str, serverpath:str, filecallback,  to
 	_currentfilesize = 0
 	# Upload the file
 	with open(filepath, "rb") as file:
-		client.upload_fileobj(file, settings.bucket_name, server_key, Callback=ProgressPercentage(internal_filepath, filecallback))
+		client.upload_fileobj(file, settings.bucket_name, server_key, Callback=ProgressPercentage(internal_filepath, threadIndex, filecallback))
 
 	# Add progress to json file
 	global _jsonfile

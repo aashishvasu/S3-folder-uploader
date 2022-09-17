@@ -4,8 +4,9 @@ import threading
 
 class ProgressPercentage(object):
 
-    def __init__(self, filename, filecallback):
+    def __init__(self, filename, index, filecallback):
         self._filename = filename
+        self._index = index
         self._filecallback = filecallback
         self._size = float(os.path.getsize(filename))
         self._seen_so_far = 0
@@ -16,7 +17,7 @@ class ProgressPercentage(object):
         with self._lock:
             self._seen_so_far += bytes_amount
             percentage = (self._seen_so_far / self._size) * 100
-            self._filecallback(percentage, os.path.basename(self._filename))
+            self._filecallback(percentage, os.path.basename(self._filename), self._index)
 
             sys.stdout.write(
                 "\r%s  %s / %s  (%.2f%%)" % (
