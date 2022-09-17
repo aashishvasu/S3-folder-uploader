@@ -9,6 +9,7 @@ S3FU is built using python and a few libraries to be a multithreaded option to u
 - Get the [latest release](https://github.com/aashishvasu/S3-folder-uploader/releases/latest) or clone the repo
 - Install the [prerequisites](#Prerequisites) (see below)
 - Fill out the `settings.ini` file based on your S3 settings
+- Change maximum number of threads for uploading based on your cpu (`MAXTHREADS` in [`uploader.py`](src/uploader.py)) - **Optional**
 - Run using
 	```sh
 	py main.py
